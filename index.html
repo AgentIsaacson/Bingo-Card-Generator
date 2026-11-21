@@ -980,7 +980,7 @@
           setStatus("Choose a whole number of cards from 1 to 200.", true);
           return;
         }
-        var availableTiles = tiles.filter(function (tile) { return tile.caption.trim(); });
+        var availableTiles = tiles.filter(function (tile) { return { ...tile, caption: tile.caption.trim() }; });
 
         try {
           applyFonts();
