@@ -1,597 +1,411 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bingo Card Maker</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Roboto", sans-serif;
+        color: #202a35;
+        background: #f3f6fa;
+        --ink: #202a35;
+        --muted: #647284;
+        --line: #d7dfe8;
+        --blue: #2864dc;
+        --tile-font: "Roboto", sans-serif;
+        --title-font: "Roboto", sans-serif;
+        --subtitle-font: "Roboto", sans-serif;
+        --free-font: "Roboto", sans-serif;
+        --title-font-size: 24pt;
+        --subtitle-font-size: 14pt;
+        --tile-font-size: 10pt;
+        --free-font-size: 14pt;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bingo Card Maker</title>
-  <style>
-    :root {
-      color-scheme: light;
-      font-family: "Roboto", sans-serif;
-      color: #202a35;
-      background: #f3f6fa;
-      --ink: #202a35;
-      --muted: #647284;
-      --line: #d7dfe8;
-      --blue: #2864dc;
-      --tile-font: "Roboto", sans-serif;
-      --title-font: "Roboto", sans-serif;
-      --subtitle-font: "Roboto", sans-serif;
-      --free-font: "Roboto", sans-serif;
-      --title-font-size: 24pt;
-      --subtitle-font-size: 14pt;
-      --tile-font-size: 10pt;
-      --free-font-size: 14pt;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      display: flex;
-      height: 100vh;
-      flex-direction: column;
-      overflow: hidden;
-      margin: 0;
-    }
-
-    button,
-    input {
-      font: inherit;
-    }
-
-    button {
-      border: 0;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    button:focus-visible,
-    input:focus-visible {
-      outline: 3px solid #8eb3ff;
-      outline-offset: 2px;
-    }
-
-    .app-header {
-      flex: 0 0 auto;
-      padding: 24px clamp(18px, 4vw, 48px);
-      color: white;
-      background: #202a35;
-    }
-
-    .app-header h1 {
-      margin: 0 0 5px;
-      font-size: 25px;
-    }
-
-    .app-header p {
-      margin: 0;
-      color: #d4dfeb;
-    }
-
-    main {
-      display: grid;
-      flex: 1 1 0;
-      width: 100%;
-      min-height: 0;
-      grid-template-columns: minmax(290px, 380px) minmax(0, 1fr);
-      grid-template-rows: minmax(0, 1fr);
-      gap: 24px;
-      align-items: stretch;
-      max-width: 1500px;
-      margin: 0 auto;
-      padding: 24px;
-    }
-
-    .settings {
-      display: grid;
-      min-height: 0;
-      align-content: start;
-      gap: 16px;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-    }
-
-    .settings-actions {
-      position: sticky;
-      bottom: 0;
-      z-index: 2;
-    }
-
-    .panel {
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: white;
-      box-shadow: 0 2px 8px #1e32400c;
-    }
-
-    .panel h2 {
-      margin: 0 0 14px;
-      font-size: 17px;
-    }
-
-    .field {
-      display: grid;
-      gap: 6px;
-      margin-bottom: 13px;
-      align-items: start;
-      align-content: start;
-    }
-
-    .font-setting {
-      display: grid;
-      grid-template-columns: minmax(0, 4fr) minmax(64px, 1fr);
-      align-items: end;
-      gap: 8px;
-    }
-
-    .font-setting-control {
-      display: grid;
-      min-width: 0;
-      gap: 6px;
-    }
-
-    .field:last-child {
-      margin-bottom: 0;
-    }
-
-    .field[hidden] {
-      display: none;
-    }
-
-    label,
-    .field-label {
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .hint,
-    .muted {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    select {
-      width: 100%;
-      min-height: 40px;
-      padding: 8px 10px;
-      border: 1px solid #bcc8d5;
-      border-radius: 7px;
-      color: var(--ink);
-      background: white;
-    }
-
-    select {
-      margin-bottom: 0px;
-    }
-
-    .two-column {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .toggle-line {
-      display: flex;
-      gap: 9px;
-      align-items: center;
-    }
-
-    .toggle-line input {
-      width: 17px;
-      height: 17px;
-      margin: 0;
-    }
-
-    .upload-button,
-    .secondary-button {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 40px;
-      border: 1px solid #b9c9dc;
-      color: #234674;
-      background: #f3f7fd;
-    }
-
-    .upload-button {
-      position: relative;
-      width: 100%;
-    }
-
-    .upload-button input {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      cursor: pointer;
-    }
-
-    .tile-list {
-      display: grid;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .tile-row {
-      display: grid;
-      grid-template-columns: 54px minmax(0, 1fr) 34px;
-      gap: 9px;
-      align-items: center;
-    }
-
-    .tile-row img {
-      width: 54px;
-      height: 54px;
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      object-fit: cover;
-    }
-
-    .tile-row input[type="text"] {
-      min-width: 0;
-    }
-
-    .remove-button {
-      width: 34px;
-      height: 34px;
-      padding: 0;
-      color: #9c2d37;
-      background: #fff0f1;
-    }
-
-    .actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .primary-button {
-      color: white;
-      background: var(--blue);
-    }
-
-    .primary-button:hover {
-      background: #1d50b7;
-    }
-
-    .secondary-button:hover {
-      background: #e8f0fb;
-    }
-
-    button:disabled {
-      cursor: not-allowed;
-      opacity: 0.55;
-    }
-
-    .status {
-      margin: 0;
-      color: #344456;
-      font-size: 13px;
-    }
-
-    .status:empty {
-      display: none;
-    }
-
-    .status:not(:empty) {
-      margin: 12px 0 0;
-    }
-
-    .status.error {
-      color: #a32632;
-    }
-
-    .results {
-      min-width: 0;
-      min-height: 0;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-    }
-
-    .results-heading {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin: 0 0 16px;
-    }
-
-    .results-heading h2 {
-      margin: 0;
-      font-size: 20px;
-    }
-
-    .empty-state {
-      padding: 48px 20px;
-      border: 2px dashed #cbd6e2;
-      border-radius: 12px;
-      color: var(--muted);
-      text-align: center;
-      background: #ffffff9c;
-    }
-
-    #cards {
-      display: grid;
-      justify-items: center;
-      gap: 24px;
-    }
-
-    .bingo-card {
-      display: flex;
-      flex-direction: column;
-      width: min(100%, 760px);
-      aspect-ratio: 8.5 / 11;
-      padding: 3.2%;
-      border: 2px solid #263648;
-      border-radius: 8px;
-      background: white;
-      box-shadow: 0 5px 20px #1425371a;
-      overflow: hidden;
-    }
-
-    .card-heading {
-      flex: 0 0 auto;
-      padding: 0 0 2.2%;
-      text-align: center;
-    }
-
-    .card-title {
-      margin: 0;
-      font-family: var(--title-font);
-      font-size: var(--title-font-size);
-      line-height: 1.12;
-      overflow-wrap: anywhere;
-    }
-
-    .card-subtitle {
-      margin: 5px 0 0;
-      font-family: var(--subtitle-font);
-      font-size: var(--subtitle-font-size);
-      line-height: 1.2;
-      overflow-wrap: anywhere;
-    }
-
-    .card-grid {
-      display: grid;
-      flex: 1 1 auto;
-      min-height: 0;
-      border-top: 2px solid #263648;
-      border-left: 2px solid #263648;
-    }
-
-    .tile-cell {
-      display: flex;
-      min-width: 0;
-      min-height: 0;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      padding: 4px;
-      border-right: 2px solid #263648;
-      border-bottom: 2px solid #263648;
-      text-align: center;
-      overflow: hidden;
-    }
-
-    .tile-cell img {
-      display: block;
-      width: 100%;
-      min-height: 0;
-      flex: 1 1 58%;
-      object-fit: contain;
-    }
-
-    .tile-caption {
-      max-width: 100%;
-      font-family: var(--tile-font);
-      font-size: var(--tile-font-size);
-      font-weight: 700;
-      line-height: 1.08;
-      overflow-wrap: anywhere;
-    }
-
-    .free-cell {
-      color: #233b5b;
-      font-family: var(--free-font);
-      font-size: var(--free-font-size);
-      font-weight: 800;
-      letter-spacing: 0.08em;
-    }
-
-    .drawing-pages {
-      display: none;
-    }
-
-    body.include-drawing-pages .drawing-pages {
-      display: grid;
-      justify-items: center;
-      gap: 24px;
-    }
-
-    .drawing-page {
-      display: flex;
-      width: min(100%, 760px);
-      aspect-ratio: 8.5 / 11;
-      flex-direction: column;
-      padding: 3.2%;
-      border: 2px solid #263648;
-      border-radius: 8px;
-      background: white;
-      box-shadow: 0 5px 20px #1425371a;
-      overflow: hidden;
-    }
-
-    .drawing-page h2 {
-      flex: 0 0 auto;
-      margin: 0 0 2.2%;
-      font-family: var(--title-font);
-      font-size: clamp(18px, 2.4vw, 25px);
-      text-align: center;
-    }
-
-    .drawing-grid {
-      display: grid;
-      flex: 1 1 auto;
-      min-height: 0;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      grid-template-rows: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .drawing-tile {
-      display: flex;
-      min-width: 0;
-      min-height: 0;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 8px;
-      border: 1px dashed #263648;
-      text-align: center;
-      overflow: hidden;
-    }
-
-    .drawing-tile img {
-      display: block;
-      width: 100%;
-      max-height: 76%;
-      flex: 1 1 auto;
-      object-fit: contain;
-    }
-
-    .drawing-caption {
-      max-width: 100%;
-      flex: 0 0 auto;
-      margin-top: 6px;
-      font-family: var(--tile-font);
-      font-size: var(--tile-font-size);
-      font-weight: 700;
-      overflow-wrap: anywhere;
-    }
-
-    @media (max-width: 850px) {
       body {
-        height: auto;
-        min-height: 100vh;
-        overflow: auto;
+        display: flex;
+        height: 100vh;
+        flex-direction: column;
+        overflow: hidden;
+        margin: 0;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      button:focus-visible,
+      input:focus-visible {
+        outline: 3px solid #8eb3ff;
+        outline-offset: 2px;
+      }
+
+      .app-header {
+        flex: 0 0 auto;
+        padding: 24px clamp(18px, 4vw, 48px);
+        color: white;
+        background: #202a35;
+      }
+
+      .app-header h1 {
+        margin: 0 0 5px;
+        font-size: 25px;
+      }
+
+      .app-header p {
+        margin: 0;
+        color: #d4dfeb;
       }
 
       main {
-        flex: 0 0 auto;
-        grid-template-columns: 1fr;
-        grid-template-rows: auto;
-        padding: 16px;
+        display: grid;
+        flex: 1 1 0;
+        width: 100%;
+        min-height: 0;
+        grid-template-columns: minmax(290px, 380px) minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr);
+        gap: 24px;
+        align-items: stretch;
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 24px;
       }
 
       .settings {
-        min-height: auto;
-        grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-        overflow-y: visible;
+        display: grid;
+        min-height: 0;
+        align-content: start;
+        gap: 16px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
       }
 
       .settings-actions {
-        position: static;
+        position: sticky;
+        bottom: 0;
+        z-index: 2;
       }
 
-      .results {
-        min-height: auto;
-        overflow-y: visible;
-      }
-    }
-
-    @media print {
-      @page {
-        size: letter portrait;
-        margin: 0.35in;
+      .panel {
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: white;
+        box-shadow: 0 2px 8px #1e32400c;
       }
 
-      html,
-      body {
-        display: block;
-        height: auto;
-        width: auto;
-        overflow: visible;
-        margin: 0;
+      .panel h2 {
+        margin: 0 0 14px;
+        font-size: 17px;
+      }
+
+      .field {
+        display: grid;
+        gap: 6px;
+        margin-bottom: 13px;
+        align-items: start;
+        align-content: start;
+      }
+
+      .font-setting {
+        display: grid;
+        grid-template-columns: minmax(0, 4fr) minmax(64px, 1fr);
+        align-items: end;
+        gap: 8px;
+      }
+
+      .font-setting-control {
+        display: grid;
+        min-width: 0;
+        gap: 6px;
+      }
+
+      .field:last-child {
+        margin-bottom: 0;
+      }
+
+      .field[hidden] {
+        display: none;
+      }
+
+      label,
+      .field-label {
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .hint,
+      .muted {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      select {
+        width: 100%;
+        min-height: 40px;
+        padding: 8px 10px;
+        border: 1px solid #bcc8d5;
+        border-radius: 7px;
+        color: var(--ink);
         background: white;
       }
 
-      .app-header,
-      .settings,
-      .results-heading,
-      .empty-state {
-        display: none !important;
+      select {
+        margin-bottom: 0px;
       }
 
-      main {
-        display: block;
-        max-width: none;
+      .two-column {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .toggle-line {
+        display: flex;
+        gap: 9px;
+        align-items: center;
+      }
+
+      .toggle-line input {
+        width: 17px;
+        height: 17px;
         margin: 0;
-        padding: 0;
       }
 
-      .results,
-      #cards {
-        display: block;
+      .upload-button,
+      .secondary-button {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 40px;
+        border: 1px solid #b9c9dc;
+        color: #234674;
+        background: #f3f7fd;
+      }
+
+      .upload-button {
+        position: relative;
         width: 100%;
-        margin: 0;
+      }
+
+      .upload-button input {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+      }
+
+      .tile-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .tile-row {
+        display: grid;
+        grid-template-columns: 54px minmax(0, 1fr) 34px;
+        gap: 9px;
+        align-items: center;
+      }
+
+      .tile-row img {
+        width: 54px;
+        height: 54px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        object-fit: cover;
+      }
+
+      .tile-row input[type="text"] {
+        min-width: 0;
+      }
+
+      .remove-button {
+        width: 34px;
+        height: 34px;
         padding: 0;
+        color: #9c2d37;
+        background: #fff0f1;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .primary-button {
+        color: white;
+        background: var(--blue);
+      }
+
+      .primary-button:hover {
+        background: #1d50b7;
+      }
+
+      .secondary-button:hover {
+        background: #e8f0fb;
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+
+      .status {
+        margin: 0;
+        color: #344456;
+        font-size: 13px;
+      }
+
+      .status:empty {
+        display: none;
+      }
+
+      .status:not(:empty) {
+        margin: 12px 0 0;
+      }
+
+      .status.error {
+        color: #a32632;
+      }
+
+      .results {
+        min-width: 0;
+        min-height: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+      }
+
+      .results-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin: 0 0 16px;
+      }
+
+      .results-heading h2 {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      .empty-state {
+        padding: 48px 20px;
+        border: 2px dashed #cbd6e2;
+        border-radius: 12px;
+        color: var(--muted);
+        text-align: center;
+        background: #ffffff9c;
+      }
+
+      #cards {
+        display: grid;
+        justify-items: center;
+        gap: 24px;
       }
 
       .bingo-card {
-        width: 100%;
-        height: 10.25in;
-        aspect-ratio: auto;
-        margin: 0;
-        padding: 0.15in;
+        display: flex;
+        flex-direction: column;
+        width: min(100%, 760px);
+        aspect-ratio: 8.5 / 11;
+        padding: 3.2%;
         border: 2px solid #263648;
-        border-radius: 0;
-        box-shadow: none;
-        break-after: page;
-        page-break-after: always;
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
-      }
-
-      .bingo-card:last-child {
-        break-after: auto;
-        page-break-after: auto;
+        border-radius: 8px;
+        background: white;
+        box-shadow: 0 5px 20px #1425371a;
+        overflow: hidden;
       }
 
       .card-heading {
-        padding-bottom: 0.12in;
+        flex: 0 0 auto;
+        padding: 0 0 2.2%;
+        text-align: center;
       }
 
       .card-title {
+        margin: 0;
+        font-family: var(--title-font);
         font-size: var(--title-font-size);
+        line-height: 1.12;
+        overflow-wrap: anywhere;
       }
 
       .card-subtitle {
-        margin-top: 3pt;
+        margin: 5px 0 0;
+        font-family: var(--subtitle-font);
         font-size: var(--subtitle-font-size);
+        line-height: 1.2;
+        overflow-wrap: anywhere;
+      }
+
+      .card-grid {
+        display: grid;
+        flex: 1 1 auto;
+        min-height: 0;
+        border-top: 2px solid #263648;
+        border-left: 2px solid #263648;
       }
 
       .tile-cell {
-        gap: 2pt;
-        padding: 3pt;
+        display: flex;
+        min-width: 0;
+        min-height: 0;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        padding: 4px;
+        border-right: 2px solid #263648;
+        border-bottom: 2px solid #263648;
+        text-align: center;
+        overflow: hidden;
+      }
+
+      .tile-cell img {
+        display: block;
+        width: 100%;
+        min-height: 0;
+        flex: 1 1 58%;
+        object-fit: contain;
       }
 
       .tile-caption {
+        max-width: 100%;
+        font-family: var(--tile-font);
         font-size: var(--tile-font-size);
+        font-weight: 700;
+        line-height: 1.08;
+        overflow-wrap: anywhere;
       }
 
       .free-cell {
+        color: #233b5b;
+        font-family: var(--free-font);
         font-size: var(--free-font-size);
+        font-weight: 800;
+        letter-spacing: 0.08em;
       }
 
       .drawing-pages {
@@ -599,35 +413,29 @@
       }
 
       body.include-drawing-pages .drawing-pages {
-        display: block;
-        break-before: page;
-        page-break-before: always;
+        display: grid;
+        justify-items: center;
+        gap: 24px;
       }
 
       .drawing-page {
         display: flex;
-        width: 100%;
-        height: 10.25in;
-        aspect-ratio: auto;
+        width: min(100%, 760px);
+        aspect-ratio: 8.5 / 11;
         flex-direction: column;
-        padding: 0;
-        border: 0;
-        border-radius: 0;
-        box-shadow: none;
-        break-after: page;
-        page-break-after: always;
-      }
-
-      .drawing-page:last-child {
-        break-after: auto;
-        page-break-after: auto;
+        padding: 3.2%;
+        border: 2px solid #263648;
+        border-radius: 8px;
+        background: white;
+        box-shadow: 0 5px 20px #1425371a;
+        overflow: hidden;
       }
 
       .drawing-page h2 {
         flex: 0 0 auto;
-        margin: 0 0 0.1in;
+        margin: 0 0 2.2%;
         font-family: var(--title-font);
-        font-size: 16pt;
+        font-size: clamp(18px, 2.4vw, 25px);
         text-align: center;
       }
 
@@ -637,7 +445,7 @@
         min-height: 0;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         grid-template-rows: repeat(4, minmax(0, 1fr));
-        gap: 0.12in;
+        gap: 8px;
       }
 
       .drawing-tile {
@@ -647,12 +455,10 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 0.12in;
+        padding: 8px;
         border: 1px dashed #263648;
         text-align: center;
         overflow: hidden;
-        break-inside: avoid;
-        page-break-inside: avoid;
       }
 
       .drawing-tile img {
@@ -666,609 +472,796 @@
       .drawing-caption {
         max-width: 100%;
         flex: 0 0 auto;
-        margin-top: 0.08in;
+        margin-top: 6px;
         font-family: var(--tile-font);
         font-size: var(--tile-font-size);
         font-weight: 700;
         overflow-wrap: anywhere;
       }
-    }
-  </style>
-</head>
 
-<body>
-  <header class="app-header">
-    <h1>Bingo Card Maker</h1>
-    <p>Create randomized, printable bingo cards from your own pictures and captions.</p>
-  </header>
+      @media (max-width: 850px) {
+        body {
+          height: auto;
+          min-height: 100vh;
+          overflow: auto;
+        }
 
-  <main>
-    <aside class="settings" aria-label="Bingo card settings">
-      <section class="panel">
-        <h2>Card details</h2>
-        <div class="field">
-          <label for="title">Title</label>
-          <input id="title" type="text" value="BINGO" maxlength="100" />
-        </div>
-        <div class="field">
-          <label for="subtitle">Subtitle</label>
-          <input id="subtitle" type="text" placeholder="Optional subtitle" maxlength="160" />
-        </div>
-        <div class="two-column">
+        main {
+          flex: 0 0 auto;
+          grid-template-columns: 1fr;
+          grid-template-rows: auto;
+          padding: 16px;
+        }
+
+        .settings {
+          min-height: auto;
+          grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+          overflow-y: visible;
+        }
+
+        .settings-actions {
+          position: static;
+        }
+
+        .results {
+          min-height: auto;
+          overflow-y: visible;
+        }
+      }
+
+      @media print {
+        @page {
+          size: letter portrait;
+          margin: 0.35in;
+        }
+
+        html,
+        body {
+          display: block;
+          height: auto;
+          width: auto;
+          overflow: visible;
+          margin: 0;
+          background: white;
+        }
+
+        .app-header,
+        .settings,
+        .results-heading,
+        .empty-state {
+          display: none !important;
+        }
+
+        main {
+          display: block;
+          max-width: none;
+          margin: 0;
+          padding: 0;
+        }
+
+        .results,
+        #cards {
+          display: block;
+          width: 100%;
+          margin: 0;
+          padding: 0;
+        }
+
+        .bingo-card {
+          width: 100%;
+          height: 10.25in;
+          aspect-ratio: auto;
+          margin: 0;
+          padding: 0.15in;
+          border: 2px solid #263648;
+          border-radius: 0;
+          box-shadow: none;
+          break-after: page;
+          page-break-after: always;
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+        }
+
+        .bingo-card:last-child {
+          break-after: auto;
+          page-break-after: auto;
+        }
+
+        .card-heading {
+          padding-bottom: 0.12in;
+        }
+
+        .card-title {
+          font-size: var(--title-font-size);
+        }
+
+        .card-subtitle {
+          margin-top: 3pt;
+          font-size: var(--subtitle-font-size);
+        }
+
+        .tile-cell {
+          gap: 2pt;
+          padding: 3pt;
+        }
+
+        .tile-caption {
+          font-size: var(--tile-font-size);
+        }
+
+        .free-cell {
+          font-size: var(--free-font-size);
+        }
+
+        .drawing-pages {
+          display: none;
+        }
+
+        body.include-drawing-pages .drawing-pages {
+          display: block;
+          break-before: page;
+          page-break-before: always;
+        }
+
+        .drawing-page {
+          display: flex;
+          width: 100%;
+          height: 10.25in;
+          aspect-ratio: auto;
+          flex-direction: column;
+          padding: 0;
+          border: 0;
+          border-radius: 0;
+          box-shadow: none;
+          break-after: page;
+          page-break-after: always;
+        }
+
+        .drawing-page:last-child {
+          break-after: auto;
+          page-break-after: auto;
+        }
+
+        .drawing-page h2 {
+          flex: 0 0 auto;
+          margin: 0 0 0.1in;
+          font-family: var(--title-font);
+          font-size: 16pt;
+          text-align: center;
+        }
+
+        .drawing-grid {
+          display: grid;
+          flex: 1 1 auto;
+          min-height: 0;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          grid-template-rows: repeat(4, minmax(0, 1fr));
+          gap: 0.12in;
+        }
+
+        .drawing-tile {
+          display: flex;
+          min-width: 0;
+          min-height: 0;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 0.12in;
+          border: 1px dashed #263648;
+          text-align: center;
+          overflow: hidden;
+          break-inside: avoid;
+          page-break-inside: avoid;
+        }
+
+        .drawing-tile img {
+          display: block;
+          width: 100%;
+          max-height: 76%;
+          flex: 1 1 auto;
+          object-fit: contain;
+        }
+
+        .drawing-caption {
+          max-width: 100%;
+          flex: 0 0 auto;
+          margin-top: 0.08in;
+          font-family: var(--tile-font);
+          font-size: var(--tile-font-size);
+          font-weight: 700;
+          overflow-wrap: anywhere;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="app-header">
+      <h1>Bingo Card Maker</h1>
+      <p>Create randomized, printable bingo cards from your own pictures and captions.</p>
+    </header>
+
+    <main>
+      <aside class="settings" aria-label="Bingo card settings">
+        <section class="panel">
+          <h2>Card details</h2>
           <div class="field">
-            <label for="grid-size">Grid size</label>
-            <select id="grid-size">
-              <option value="2">2 × 2</option>
-              <option value="3">3 × 3</option>
-              <option value="4">4 × 4</option>
-              <option value="5" selected>5 × 5</option>
-              <option value="6">6 × 6</option>
-              <option value="7">7 × 7</option>
-              <option value="8">8 × 8</option>
-              <option value="9">9 × 9</option>
-            </select>
+            <label for="title">Title</label>
+            <input id="title" type="text" value="BINGO" maxlength="100" />
           </div>
           <div class="field">
-            <label for="card-count">Number of cards</label>
-            <input id="card-count" type="number" min="1" max="200" value="1" />
-            <span class="hint">Generate 1–200 cards per batch.</span>
+            <label for="subtitle">Subtitle</label>
+            <input id="subtitle" type="text" placeholder="Optional subtitle" maxlength="160" />
           </div>
-        </div>
-        <div class="field">
-          <label class="toggle-line" for="include-drawing-pages">
-            <input id="include-drawing-pages" type="checkbox" checked />
-            <span>Include tile drawing pages in preview and printout</span>
+          <div class="two-column">
+            <div class="field">
+              <label for="grid-size">Grid size</label>
+              <select id="grid-size">
+                <option value="2">2 × 2</option>
+                <option value="3">3 × 3</option>
+                <option value="4">4 × 4</option>
+                <option value="5" selected>5 × 5</option>
+                <option value="6">6 × 6</option>
+                <option value="7">7 × 7</option>
+                <option value="8">8 × 8</option>
+                <option value="9">9 × 9</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="card-count">Number of cards</label>
+              <input id="card-count" type="number" min="1" max="200" value="1" />
+              <span class="hint">Generate 1–200 cards per batch.</span>
+            </div>
+          </div>
+          <div class="field">
+            <label class="toggle-line" for="include-drawing-pages">
+              <input id="include-drawing-pages" type="checkbox" checked />
+              <span>Include tile drawing pages in preview and printout</span>
+            </label>
+            <span class="hint">Show one larger copy of each tile after the bingo cards, up to 12 per page.</span>
+          </div>
+          <div class="field">
+            <label class="toggle-line" for="free-space">
+              <input id="free-space" type="checkbox" checked />
+              <span>Include a center free space</span>
+            </label>
+            <span id="free-space-hint" class="hint">A free space is available on odd-sized grids.</span>
+          </div>
+          <div id="free-space-text-field" class="field">
+            <label for="free-space-text">Free Space Text</label>
+            <input id="free-space-text" type="text" value="FREE SPACE" maxlength="40" />
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Fonts</h2>
+          <p class="hint">Enter a Google Fonts family name, Google Fonts stylesheet or share URL, or a direct font file URL. Online fonts require an internet connection.</p>
+          <div class="field font-setting">
+            <div class="font-setting-control">
+              <label for="title-font">Title</label>
+              <input id="title-font" type="text" value="Roboto" autocomplete="off" />
+            </div>
+            <div class="font-setting-control">
+              <label for="title-font-size">Size</label>
+              <input id="title-font-size" type="number" min="8" max="48" step="any" value="24" />
+            </div>
+          </div>
+          <div class="field font-setting">
+            <div class="font-setting-control">
+              <label for="subtitle-font">Subtitle</label>
+              <input id="subtitle-font" type="text" value="Roboto" autocomplete="off" />
+            </div>
+            <div class="font-setting-control">
+              <label for="subtitle-font-size">Size</label>
+              <input id="subtitle-font-size" type="number" min="8" max="48" step="any" value="14" />
+            </div>
+          </div>
+          <div class="field font-setting">
+            <div class="font-setting-control">
+              <label for="tile-font">Caption</label>
+              <input id="tile-font" type="text" value="Roboto" autocomplete="off" />
+            </div>
+            <div class="font-setting-control">
+              <label for="tile-font-size">Size</label>
+              <input id="tile-font-size" type="number" min="8" max="48" step="any" value="10" />
+            </div>
+          </div>
+          <div class="field font-setting">
+            <div class="font-setting-control">
+              <label for="free-font">Free space</label>
+              <input id="free-font" type="text" value="Roboto" autocomplete="off" />
+            </div>
+            <div class="font-setting-control">
+              <label for="free-font-size">Size</label>
+              <input id="free-font-size" type="number" min="8" max="48" step="any" value="14" />
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Picture and caption tiles</h2>
+          <p class="hint">
+            Captions start as the image filename; edit them below. If there are fewer captioned images than grid spaces, the remaining spaces are left blank. Images stay in this browser.
+          </p>
+          <label class="upload-button">
+            Add image files
+            <input id="image-files" type="file" accept="image/*" multiple />
           </label>
-          <span class="hint">Show one larger copy of each tile after the bingo cards, up to 12 per page.</span>
+          <div id="tile-list" class="tile-list"></div>
+          <p id="tile-count" class="hint">No images added yet.</p>
+        </section>
+
+        <section class="panel settings-actions">
+          <div class="actions">
+            <button id="generate" class="primary-button" type="button">Generate cards</button>
+            <button id="print" class="secondary-button" type="button" disabled>Print cards</button>
+          </div>
+          <p id="status" class="status" role="status" aria-live="polite"></p>
+        </section>
+      </aside>
+
+      <section class="results" aria-label="Generated bingo cards">
+        <div class="results-heading">
+          <h2>Your cards</h2>
+          <span id="result-count" class="muted"></span>
         </div>
-        <div class="field">
-          <label class="toggle-line" for="free-space">
-            <input id="free-space" type="checkbox" checked />
-            <span>Include a center free space</span>
-          </label>
-          <span id="free-space-hint" class="hint">A free space is available on odd-sized grids.</span>
-        </div>
-        <div id="free-space-text-field" class="field">
-          <label for="free-space-text">Free Space Text</label>
-          <input id="free-space-text" type="text" value="FREE SPACE" maxlength="40" />
-        </div>
+        <div id="empty-state" class="empty-state">Add your image and caption pairs, then select <strong>Generate cards</strong>.</div>
+        <div id="cards"></div>
+        <div id="drawing-pages" class="drawing-pages" aria-label="Tile drawing pages"></div>
       </section>
+    </main>
 
-      <section class="panel">
-        <h2>Fonts</h2>
-        <p class="hint">Enter a Google Fonts family name, Google Fonts stylesheet or share URL, or a direct font file
-          URL. Online fonts require an internet connection.</p>
-        <div class="field font-setting">
-          <div class="font-setting-control">
-            <label for="title-font">Title</label>
-            <input id="title-font" type="text" value="Roboto" autocomplete="off" />
-          </div>
-          <div class="font-setting-control">
-            <label for="title-font-size">Size</label>
-            <input id="title-font-size" type="number" min="8" max="48" step="any" value="24" />
-          </div>
-        </div>
-        <div class="field font-setting">
-          <div class="font-setting-control">
-            <label for="subtitle-font">Subtitle</label>
-            <input id="subtitle-font" type="text" value="Roboto" autocomplete="off" />
-          </div>
-          <div class="font-setting-control">
-            <label for="subtitle-font-size">Size</label>
-            <input id="subtitle-font-size" type="number" min="8" max="48" step="any" value="14" />
-          </div>
-        </div>
-        <div class="field font-setting">
-          <div class="font-setting-control">
-            <label for="tile-font">Caption</label>
-            <input id="tile-font" type="text" value="Roboto" autocomplete="off" />
-          </div>
-          <div class="font-setting-control">
-            <label for="tile-font-size">Size</label>
-            <input id="tile-font-size" type="number" min="8" max="48" step="any" value="10" />
-          </div>
-        </div>
-        <div class="field font-setting">
-          <div class="font-setting-control">
-            <label for="free-font">Free space</label>
-            <input id="free-font" type="text" value="Roboto" autocomplete="off" />
-          </div>
-          <div class="font-setting-control">
-            <label for="free-font-size">Size</label>
-            <input id="free-font-size" type="number" min="8" max="48" step="any" value="14" />
-          </div>
-        </div>
-      </section>
+    <script>
+      (function () {
+        "use strict";
 
-      <section class="panel">
-        <h2>Picture and caption tiles</h2>
-        <p class="hint">
-          Captions start as the image filename; edit them below. If there are fewer captioned images than grid spaces,
-          the remaining spaces are left blank. Images stay in this browser.
-        </p>
-        <label class="upload-button">
-          Add image files
-          <input id="image-files" type="file" accept="image/*" multiple />
-        </label>
-        <div id="tile-list" class="tile-list"></div>
-        <p id="tile-count" class="hint">No images added yet.</p>
-      </section>
+        var tiles = [];
+        var nextTileId = 1;
+        var generatedCards = 0;
+        var imageInput = document.getElementById("image-files");
+        var tileList = document.getElementById("tile-list");
+        var gridSizeInput = document.getElementById("grid-size");
+        var freeSpaceInput = document.getElementById("free-space");
+        var freeSpaceTextField = document.getElementById("free-space-text-field");
+        var generateButton = document.getElementById("generate");
+        var printButton = document.getElementById("print");
+        var includeDrawingPagesInput = document.getElementById("include-drawing-pages");
+        var status = document.getElementById("status");
+        var cardsElement = document.getElementById("cards");
+        var drawingPagesElement = document.getElementById("drawing-pages");
+        var emptyState = document.getElementById("empty-state");
 
-      <section class="panel settings-actions">
-        <div class="actions">
-          <button id="generate" class="primary-button" type="button">Generate cards</button>
-          <button id="print" class="secondary-button" type="button" disabled>Print cards</button>
-        </div>
-        <p id="status" class="status" role="status" aria-live="polite"></p>
-      </section>
-    </aside>
-
-    <section class="results" aria-label="Generated bingo cards">
-      <div class="results-heading">
-        <h2>Your cards</h2>
-        <span id="result-count" class="muted"></span>
-      </div>
-      <div id="empty-state" class="empty-state">Add your image and caption pairs, then select <strong>Generate
-          cards</strong>.</div>
-      <div id="cards"></div>
-      <div id="drawing-pages" class="drawing-pages" aria-label="Tile drawing pages"></div>
-    </section>
-  </main>
-
-  <script>
-    (function () {
-      "use strict";
-
-      var tiles = [];
-      var nextTileId = 1;
-      var generatedCards = 0;
-      var imageInput = document.getElementById("image-files");
-      var tileList = document.getElementById("tile-list");
-      var gridSizeInput = document.getElementById("grid-size");
-      var freeSpaceInput = document.getElementById("free-space");
-      var freeSpaceTextField = document.getElementById("free-space-text-field");
-      var generateButton = document.getElementById("generate");
-      var printButton = document.getElementById("print");
-      var includeDrawingPagesInput = document.getElementById("include-drawing-pages");
-      var status = document.getElementById("status");
-      var cardsElement = document.getElementById("cards");
-      var drawingPagesElement = document.getElementById("drawing-pages");
-      var emptyState = document.getElementById("empty-state");
-
-      function setStatus(message, isError) {
-        status.textContent = message;
-        status.classList.toggle("error", Boolean(isError));
-      }
-
-      function updateDrawingPagesVisibility() {
-        document.body.classList.toggle("include-drawing-pages", includeDrawingPagesInput.checked && drawingPagesElement.children.length > 0);
-      }
-
-      function renderDrawingPages(availableTiles) {
-        drawingPagesElement.replaceChildren();
-        for (var start = 0; start < availableTiles.length; start += 12) {
-          var page = document.createElement("section");
-          page.className = "drawing-page";
-          page.setAttribute("aria-label", "Drawing tiles page " + (Math.floor(start / 12) + 1));
-
-          var heading = document.createElement("h2");
-          heading.textContent = "Tiles for Drawing";
-
-          var grid = document.createElement("div");
-          grid.className = "drawing-grid";
-          availableTiles.slice(start, start + 12).forEach(function (tile) {
-            var drawingTile = document.createElement("div");
-            drawingTile.className = "drawing-tile";
-            var image = document.createElement("img");
-            image.src = tile.image;
-            image.alt = tile.caption;
-            var caption = document.createElement("span");
-            caption.className = "drawing-caption";
-            caption.textContent = tile.caption;
-            drawingTile.append(image, caption);
-            grid.appendChild(drawingTile);
-          });
-          page.append(heading, grid);
-          drawingPagesElement.appendChild(page);
-        }
-        updateDrawingPagesVisibility();
-      }
-
-      includeDrawingPagesInput.addEventListener("change", updateDrawingPagesVisibility);
-
-      function fileAsDataUrl(file) {
-        return new Promise(function (resolve, reject) {
-          var reader = new FileReader();
-          reader.onload = function () {
-            if (typeof reader.result !== "string") {
-              reject(new Error("The image could not be read."));
-              return;
-            }
-            resolve(reader.result);
-          };
-          reader.onerror = function () {
-            reject(reader.error || new Error("The image could not be read."));
-          };
-          reader.readAsDataURL(file);
-        });
-      }
-
-      function renderTileList() {
-        tileList.replaceChildren();
-        tiles.forEach(function (tile) {
-          var row = document.createElement("div");
-          row.className = "tile-row";
-
-          var image = document.createElement("img");
-          image.src = tile.image;
-          image.alt = "";
-
-          var caption = document.createElement("input");
-          caption.type = "text";
-          caption.maxLength = 100;
-          caption.value = tile.caption;
-          caption.setAttribute("aria-label", "Caption for " + tile.fileName);
-          caption.addEventListener("input", function () {
-            tile.caption = caption.value;
-          });
-
-          var remove = document.createElement("button");
-          remove.className = "remove-button";
-          remove.type = "button";
-          remove.textContent = "×";
-          remove.setAttribute("aria-label", "Remove " + tile.fileName);
-          remove.addEventListener("click", function () {
-            tiles = tiles.filter(function (candidate) {
-              return candidate.id !== tile.id;
-            });
-            renderTileList();
-          });
-
-          row.append(image, caption, remove);
-          tileList.appendChild(row);
-        });
-        document.getElementById("tile-count").textContent = tiles.length + (tiles.length === 1 ? " image added." : " images added.");
-      }
-
-      imageInput.addEventListener("change", async function () {
-        var files = Array.prototype.slice.call(imageInput.files || []);
-        imageInput.value = "";
-        var validFiles = files.filter(function (file) {
-          return file.type.indexOf("image/") === 0;
-        });
-        if (validFiles.length !== files.length) {
-          setStatus("Some selected files were not images and were skipped.", true);
-        } else if (files.length) {
-          setStatus("Loading images…", false);
+        function setStatus(message, isError) {
+          status.textContent = message;
+          status.classList.toggle("error", Boolean(isError));
         }
 
-        try {
-          var loaded = await Promise.all(
-            validFiles.map(async function (file) {
-              return {
-                id: nextTileId++,
-                image: await fileAsDataUrl(file),
-                fileName: file.name,
-                caption: file.name.replace(/\.[^.]+$/, ""),
-              };
-            }),
-          );
-          tiles = tiles.concat(loaded);
-          renderTileList();
-          if (loaded.length) {
-            setStatus(loaded.length + (loaded.length === 1 ? " image added." : " images added."), false);
-          }
-        } catch (error) {
-          setStatus("Could not load an image: " + error.message, true);
-        }
-      });
-
-      function updateFreeSpaceAvailability() {
-        var size = Number(gridSizeInput.value);
-        var supported = size % 2 === 1;
-        freeSpaceInput.disabled = !supported;
-        if (!supported) {
-          freeSpaceInput.checked = false;
-        }
-        freeSpaceTextField.hidden = !freeSpaceInput.checked || freeSpaceInput.disabled;
-        document.getElementById("free-space-hint").textContent = supported
-          ? ""
-          : "A single center square only exists on odd-sized grids, so free space is unavailable here.";
-      }
-
-      gridSizeInput.addEventListener("change", updateFreeSpaceAvailability);
-      freeSpaceInput.addEventListener("change", updateFreeSpaceAvailability);
-
-      function fontUrl(family) {
-        var url = new URL("https://fonts.googleapis.com/css2");
-        url.searchParams.set("family", family);
-        url.searchParams.set("display", "swap");
-        return url.href;
-      }
-
-      function applyFont(inputId, variable, familyName, linkId, styleId) {
-        var value = document.getElementById(inputId).value.trim();
-        var link = document.getElementById(linkId);
-        var style = document.getElementById(styleId);
-        var stylesheetUrl = "";
-        var fontFamily = value;
-        var fontFileUrl = "";
-
-        if (!value) {
-          if (link) link.remove();
-          if (style) style.remove();
-          document.documentElement.style.setProperty(variable, "sans-serif");
-          return;
+        function updateDrawingPagesVisibility() {
+          document.body.classList.toggle("include-drawing-pages", includeDrawingPagesInput.checked && drawingPagesElement.children.length > 0);
         }
 
-        if (/^https?:\/\//i.test(value)) {
-          var url;
-          try {
-            url = new URL(value);
-          } catch (error) {
-            throw new Error("Enter a valid font URL or Google Fonts family name.");
-          }
-          if (url.hostname === "fonts.googleapis.com") {
-            var familySpecs = url.searchParams.getAll("family");
-            if (!familySpecs.length) {
-              throw new Error("The Google Fonts stylesheet URL must include a font family.");
-            }
-            stylesheetUrl = url.href;
-            fontFamily = familySpecs[0].split("|")[0].split(":")[0].replace(/\+/g, " ");
-          } else if (url.hostname === "fonts.google.com" && url.pathname.indexOf("/share") === 0) {
-            var selection = url.searchParams.get("selection.family");
-            if (!selection) {
-              throw new Error("The Google Fonts share URL must include a font family.");
-            }
-            var familySpec = selection.split("|")[0];
-            fontFamily = familySpec.split(":")[0].replace(/\+/g, " ");
-            stylesheetUrl = fontUrl(familySpec);
-          } else if (/\.(woff2?|ttf|otf)(?:$|[?#])/i.test(url.href)) {
-            fontFileUrl = url.href;
-            fontFamily = familyName.replace(/"/g, "");
-          } else {
-            throw new Error("Use a Google Fonts family, Google Fonts stylesheet/share URL, or a direct font file URL.");
-          }
-        } else {
-          stylesheetUrl = fontUrl(value);
-        }
+        function renderDrawingPages(availableTiles) {
+          drawingPagesElement.replaceChildren();
+          for (var start = 0; start < availableTiles.length; start += 12) {
+            var page = document.createElement("section");
+            page.className = "drawing-page";
+            page.setAttribute("aria-label", "Drawing tiles page " + (Math.floor(start / 12) + 1));
 
-        if (link) link.remove();
-        if (style) style.remove();
-        if (stylesheetUrl) {
-          link = document.createElement("link");
-          link.id = linkId;
-          link.rel = "stylesheet";
-          link.href = stylesheetUrl;
-          document.head.appendChild(link);
-        } else if (fontFileUrl) {
-          style = document.createElement("style");
-          style.id = styleId;
-          style.textContent = "@font-face{font-family:" + familyName + ';src:url("' + fontFileUrl.replace(/["\\]/g, "\\$&") + '");font-display:swap}';
-          document.head.appendChild(style);
-        }
+            var heading = document.createElement("h2");
+            heading.textContent = "Tiles for Drawing";
 
-        var quotedFamily = '"' + fontFamily.replace(/\\/g, "\\\\").replace(/"/g, '\\"') + '"';
-        document.documentElement.style.setProperty(variable, quotedFamily + ", sans-serif");
-      }
-
-      function applyFonts() {
-        applyFont("title-font", "--title-font", '"BingoTitleFont"', "title-font-link", "title-font-style");
-        applyFont("subtitle-font", "--subtitle-font", '"BingoSubtitleFont"', "subtitle-font-link", "subtitle-font-style");
-        applyFont("tile-font", "--tile-font", '"BingoTileFont"', "tile-font-link", "tile-font-style");
-        applyFont("free-font", "--free-font", '"BingoFreeFont"', "free-font-link", "free-font-style");
-      }
-
-      function applyFontSizes() {
-        var sizes = [
-          { id: "title-font-size", variable: "--title-font-size", label: "Title" },
-          { id: "subtitle-font-size", variable: "--subtitle-font-size", label: "Subtitle" },
-          { id: "tile-font-size", variable: "--tile-font-size", label: "Caption" },
-          { id: "free-font-size", variable: "--free-font-size", label: "Free space" },
-        ].map(function (field) {
-          var size = Number(document.getElementById(field.id).value);
-          if (!Number.isFinite(size) || size < 8 || size > 48) {
-            throw new Error(field.label + " font size must be between 8 and 48 pt.");
-          }
-          field.value = size + "pt";
-          return field;
-        });
-        sizes.forEach(function (field) {
-          document.documentElement.style.setProperty(field.variable, field.value);
-        });
-      }
-
-      ["title-font-size", "subtitle-font-size", "tile-font-size", "free-font-size"].forEach(function (id) {
-        document.getElementById(id).addEventListener("change", function () {
-          try {
-            applyFontSizes();
-            setStatus("", false);
-          } catch (error) {
-            setStatus(error.message, true);
-          }
-        });
-      });
-
-      function layoutCapacity(tileCount, slots, limit) {
-        var capacity = 1;
-        var placements = Math.min(tileCount, slots);
-        var choices = Math.max(tileCount, slots);
-        for (var index = 0; index < placements; index++) {
-          capacity *= choices - index;
-          if (capacity >= limit) return limit;
-        }
-        return capacity;
-      }
-
-      function createLayout(pool, slots) {
-        var shuffled = pool.slice();
-        for (var index = shuffled.length - 1; index > 0; index--) {
-          var swapIndex = Math.floor(Math.random() * (index + 1));
-          var temp = shuffled[index];
-          shuffled[index] = shuffled[swapIndex];
-          shuffled[swapIndex] = temp;
-        }
-        var layout = shuffled.slice(0, slots);
-        while (layout.length < slots) {
-          layout.push(null);
-        }
-        for (var position = layout.length - 1; position > 0; position--) {
-          var randomPosition = Math.floor(Math.random() * (position + 1));
-          var tile = layout[position];
-          layout[position] = layout[randomPosition];
-          layout[randomPosition] = tile;
-        }
-        return layout;
-      }
-
-      function createCard(layout, size, freeIndex, title, subtitle, freeText, cardNumber) {
-        var card = document.createElement("article");
-        card.className = "bingo-card";
-        card.setAttribute("aria-label", "Bingo card " + cardNumber);
-
-        var heading = document.createElement("header");
-        heading.className = "card-heading";
-        var titleElement = document.createElement("h1");
-        titleElement.className = "card-title";
-        titleElement.textContent = title;
-        heading.appendChild(titleElement);
-        if (subtitle) {
-          var subtitleElement = document.createElement("p");
-          subtitleElement.className = "card-subtitle";
-          subtitleElement.textContent = subtitle;
-          heading.appendChild(subtitleElement);
-        }
-
-        var grid = document.createElement("div");
-        grid.className = "card-grid";
-        grid.style.gridTemplateColumns = "repeat(" + size + ", minmax(0, 1fr))";
-        grid.style.gridTemplateRows = "repeat(" + size + ", minmax(0, 1fr))";
-        var layoutIndex = 0;
-        for (var position = 0; position < size * size; position++) {
-          var cell = document.createElement("div");
-          cell.className = "tile-cell";
-          if (position === freeIndex) {
-            cell.classList.add("free-cell");
-            cell.textContent = freeText;
-            cell.setAttribute("aria-label", freeText || "Free space");
-          } else {
-            var tile = layout[layoutIndex++];
-            if (tile) {
+            var grid = document.createElement("div");
+            grid.className = "drawing-grid";
+            availableTiles.slice(start, start + 12).forEach(function (tile) {
+              var drawingTile = document.createElement("div");
+              drawingTile.className = "drawing-tile";
               var image = document.createElement("img");
               image.src = tile.image;
               image.alt = tile.caption;
               var caption = document.createElement("span");
-              caption.className = "tile-caption";
+              caption.className = "drawing-caption";
               caption.textContent = tile.caption;
-              cell.append(image, caption);
-            } else {
-              cell.classList.add("blank-cell");
-              cell.setAttribute("aria-label", "Blank space");
-            }
+              drawingTile.append(image, caption);
+              grid.appendChild(drawingTile);
+            });
+            page.append(heading, grid);
+            drawingPagesElement.appendChild(page);
           }
-          grid.appendChild(cell);
+          updateDrawingPagesVisibility();
         }
-        card.append(heading, grid);
-        return card;
-      }
 
-      generateButton.addEventListener("click", function () {
-        var size = Number(gridSizeInput.value);
-        var useFree = freeSpaceInput.checked && size % 2 === 1;
-        var slots = size * size - (useFree ? 1 : 0);
-        var requested = Number(document.getElementById("card-count").value);
-        var title = document.getElementById("title").value.trim();
-        var subtitle = document.getElementById("subtitle").value.trim();
-        var freeText = document.getElementById("free-space-text").value.trim();
+        includeDrawingPagesInput.addEventListener("change", updateDrawingPagesVisibility);
 
-        if (!Number.isInteger(requested) || requested < 1 || requested > 200) {
-          setStatus("Choose a whole number of cards from 1 to 200.", true);
-          return;
+        function fileAsDataUrl(file) {
+          return new Promise(function (resolve, reject) {
+            var reader = new FileReader();
+            reader.onload = function () {
+              if (typeof reader.result !== "string") {
+                reject(new Error("The image could not be read."));
+                return;
+              }
+              resolve(reader.result);
+            };
+            reader.onerror = function () {
+              reject(reader.error || new Error("The image could not be read."));
+            };
+            reader.readAsDataURL(file);
+          });
         }
-        var availableTiles = tiles.filter(function (tile) {
-          return { ...tile, caption: tile.caption.trim() };
+
+        function renderTileList() {
+          tileList.replaceChildren();
+          tiles.forEach(function (tile) {
+            var row = document.createElement("div");
+            row.className = "tile-row";
+
+            var image = document.createElement("img");
+            image.src = tile.image;
+            image.alt = "";
+
+            var caption = document.createElement("input");
+            caption.type = "text";
+            caption.maxLength = 100;
+            caption.value = tile.caption;
+            caption.setAttribute("aria-label", "Caption for " + tile.fileName);
+            caption.addEventListener("input", function () {
+              tile.caption = caption.value;
+            });
+
+            var remove = document.createElement("button");
+            remove.className = "remove-button";
+            remove.type = "button";
+            remove.textContent = "×";
+            remove.setAttribute("aria-label", "Remove " + tile.fileName);
+            remove.addEventListener("click", function () {
+              tiles = tiles.filter(function (candidate) {
+                return candidate.id !== tile.id;
+              });
+              renderTileList();
+            });
+
+            row.append(image, caption, remove);
+            tileList.appendChild(row);
+          });
+          document.getElementById("tile-count").textContent = tiles.length + (tiles.length === 1 ? " image added." : " images added.");
+        }
+
+        imageInput.addEventListener("change", async function () {
+          var files = Array.prototype.slice.call(imageInput.files || []);
+          imageInput.value = "";
+          var validFiles = files.filter(function (file) {
+            return file.type.indexOf("image/") === 0;
+          });
+          if (validFiles.length !== files.length) {
+            setStatus("Some selected files were not images and were skipped.", true);
+          } else if (files.length) {
+            setStatus("Loading images…", false);
+          }
+
+          try {
+            var loaded = await Promise.all(
+              validFiles.map(async function (file) {
+                return {
+                  id: nextTileId++,
+                  image: await fileAsDataUrl(file),
+                  fileName: file.name,
+                  caption: file.name.replace(/\.[^.]+$/, ""),
+                };
+              }),
+            );
+            tiles = tiles.concat(loaded);
+            renderTileList();
+            if (loaded.length) {
+              setStatus(loaded.length + (loaded.length === 1 ? " image added." : " images added."), false);
+            }
+          } catch (error) {
+            setStatus("Could not load an image: " + error.message, true);
+          }
         });
 
-        try {
-          applyFonts();
-          applyFontSizes();
-        } catch (error) {
-          setStatus(error.message, true);
-          return;
+        function updateFreeSpaceAvailability() {
+          var size = Number(gridSizeInput.value);
+          var supported = size % 2 === 1;
+          freeSpaceInput.disabled = !supported;
+          if (!supported) {
+            freeSpaceInput.checked = false;
+          }
+          freeSpaceTextField.hidden = !freeSpaceInput.checked || freeSpaceInput.disabled;
+          document.getElementById("free-space-hint").textContent = supported ? "" : "A single center square only exists on odd-sized grids, so free space is unavailable here.";
         }
 
-        var capacity = layoutCapacity(availableTiles.length, slots, requested);
-        var allowDuplicates = false;
-        if (capacity < requested) {
-          allowDuplicates = window.confirm(
-            "Only " + capacity + " unique layouts are possible with these tiles and this grid. " + "Choose OK to allow duplicate layouts, or Cancel to stop and add more tile pairs.",
-          );
-          if (!allowDuplicates) {
-            setStatus("Generation canceled. Add more tile pairs or request fewer cards.", false);
+        gridSizeInput.addEventListener("change", updateFreeSpaceAvailability);
+        freeSpaceInput.addEventListener("change", updateFreeSpaceAvailability);
+
+        function fontUrl(family) {
+          var url = new URL("https://fonts.googleapis.com/css2");
+          url.searchParams.set("family", family);
+          url.searchParams.set("display", "swap");
+          return url.href;
+        }
+
+        function applyFont(inputId, variable, familyName, linkId, styleId) {
+          var value = document.getElementById(inputId).value.trim();
+          var link = document.getElementById(linkId);
+          var style = document.getElementById(styleId);
+          var stylesheetUrl = "";
+          var fontFamily = value;
+          var fontFileUrl = "";
+
+          if (!value) {
+            if (link) link.remove();
+            if (style) style.remove();
+            document.documentElement.style.setProperty(variable, "sans-serif");
             return;
           }
-        }
 
-        var freeIndex = useFree ? Math.floor((size * size) / 2) : -1;
-        var cards = [];
-        var usedLayouts = new Set();
-        var uniqueTarget = Math.min(requested, capacity);
-        var attempts = 0;
-        while (cards.length < uniqueTarget && attempts < uniqueTarget * 50 + 100) {
-          attempts++;
-          var layout = createLayout(availableTiles, slots);
-          var key = layout
-            .map(function (tile) {
-              return tile ? tile.id : "blank";
-            })
-            .join(",");
-          if (!usedLayouts.has(key)) {
-            usedLayouts.add(key);
-            cards.push(layout);
+          if (/^https?:\/\//i.test(value)) {
+            var url;
+            try {
+              url = new URL(value);
+            } catch (error) {
+              throw new Error("Enter a valid font URL or Google Fonts family name.");
+            }
+            if (url.hostname === "fonts.googleapis.com") {
+              var familySpecs = url.searchParams.getAll("family");
+              if (!familySpecs.length) {
+                throw new Error("The Google Fonts stylesheet URL must include a font family.");
+              }
+              stylesheetUrl = url.href;
+              fontFamily = familySpecs[0].split("|")[0].split(":")[0].replace(/\+/g, " ");
+            } else if (url.hostname === "fonts.google.com" && url.pathname.indexOf("/share") === 0) {
+              var selection = url.searchParams.get("selection.family");
+              if (!selection) {
+                throw new Error("The Google Fonts share URL must include a font family.");
+              }
+              var familySpec = selection.split("|")[0];
+              fontFamily = familySpec.split(":")[0].replace(/\+/g, " ");
+              stylesheetUrl = fontUrl(familySpec);
+            } else if (/\.(woff2?|ttf|otf)(?:$|[?#])/i.test(url.href)) {
+              fontFileUrl = url.href;
+              fontFamily = familyName.replace(/"/g, "");
+            } else {
+              throw new Error("Use a Google Fonts family, Google Fonts stylesheet/share URL, or a direct font file URL.");
+            }
+          } else {
+            stylesheetUrl = fontUrl(value);
           }
-        }
-        if (cards.length < uniqueTarget) {
-          setStatus("Could not create enough unique layouts. Try a smaller card count or add more tile pairs.", true);
-          return;
-        }
-        while (cards.length < requested) {
-          cards.push(createLayout(availableTiles, slots));
+
+          if (link) link.remove();
+          if (style) style.remove();
+          if (stylesheetUrl) {
+            link = document.createElement("link");
+            link.id = linkId;
+            link.rel = "stylesheet";
+            link.href = stylesheetUrl;
+            document.head.appendChild(link);
+          } else if (fontFileUrl) {
+            style = document.createElement("style");
+            style.id = styleId;
+            style.textContent = "@font-face{font-family:" + familyName + ';src:url("' + fontFileUrl.replace(/["\\]/g, "\\$&") + '");font-display:swap}';
+            document.head.appendChild(style);
+          }
+
+          var quotedFamily = '"' + fontFamily.replace(/\\/g, "\\\\").replace(/"/g, '\\"') + '"';
+          document.documentElement.style.setProperty(variable, quotedFamily + ", sans-serif");
         }
 
-        cardsElement.replaceChildren();
-        cards.forEach(function (layout, index) {
-          cardsElement.appendChild(createCard(layout, size, freeIndex, title, subtitle, freeText, index + 1));
+        function applyFonts() {
+          applyFont("title-font", "--title-font", '"BingoTitleFont"', "title-font-link", "title-font-style");
+          applyFont("subtitle-font", "--subtitle-font", '"BingoSubtitleFont"', "subtitle-font-link", "subtitle-font-style");
+          applyFont("tile-font", "--tile-font", '"BingoTileFont"', "tile-font-link", "tile-font-style");
+          applyFont("free-font", "--free-font", '"BingoFreeFont"', "free-font-link", "free-font-style");
+        }
+
+        function applyFontSizes() {
+          var sizes = [
+            { id: "title-font-size", variable: "--title-font-size", label: "Title" },
+            { id: "subtitle-font-size", variable: "--subtitle-font-size", label: "Subtitle" },
+            { id: "tile-font-size", variable: "--tile-font-size", label: "Caption" },
+            { id: "free-font-size", variable: "--free-font-size", label: "Free space" },
+          ].map(function (field) {
+            var size = Number(document.getElementById(field.id).value);
+            if (!Number.isFinite(size) || size < 8 || size > 48) {
+              throw new Error(field.label + " font size must be between 8 and 48 pt.");
+            }
+            field.value = size + "pt";
+            return field;
+          });
+          sizes.forEach(function (field) {
+            document.documentElement.style.setProperty(field.variable, field.value);
+          });
+        }
+
+        ["title-font-size", "subtitle-font-size", "tile-font-size", "free-font-size"].forEach(function (id) {
+          document.getElementById(id).addEventListener("change", function () {
+            try {
+              applyFontSizes();
+              setStatus("", false);
+            } catch (error) {
+              setStatus(error.message, true);
+            }
+          });
         });
-        renderDrawingPages(availableTiles);
-        generatedCards = cards.length;
-        printButton.disabled = generatedCards === 0;
-        emptyState.hidden = true;
-        document.getElementById("result-count").textContent = generatedCards + (generatedCards === 1 ? " card" : " cards");
-        var message = "Generated " + generatedCards + (generatedCards === 1 ? " card." : " cards.");
-        var blankCount = Math.max(0, slots - availableTiles.length);
-        if (blankCount) {
-          message += " " + blankCount + (blankCount === 1 ? " space is" : " spaces are") + " blank on each card.";
-        }
-        if (capacity < requested) {
-          message += " Some layouts repeat.";
-        }
-        setStatus(message, false);
-      });
 
-      printButton.addEventListener("click", function () {
-        if (generatedCards) {
-          renderDrawingPages(
-            tiles.filter(function (tile) {
-              return { ...tile, caption: tile.caption.trim() };
-            }),
-          );
-          window.print();
+        function layoutCapacity(tileCount, slots, limit) {
+          var capacity = 1;
+          var placements = Math.min(tileCount, slots);
+          var choices = Math.max(tileCount, slots);
+          for (var index = 0; index < placements; index++) {
+            capacity *= choices - index;
+            if (capacity >= limit) return limit;
+          }
+          return capacity;
         }
-      });
 
-      updateFreeSpaceAvailability();
-    })();
-  </script>
-</body>
+        function createLayout(pool, slots) {
+          var shuffled = pool.slice();
+          for (var index = shuffled.length - 1; index > 0; index--) {
+            var swapIndex = Math.floor(Math.random() * (index + 1));
+            var temp = shuffled[index];
+            shuffled[index] = shuffled[swapIndex];
+            shuffled[swapIndex] = temp;
+          }
+          var layout = shuffled.slice(0, slots);
+          while (layout.length < slots) {
+            layout.push(null);
+          }
+          for (var position = layout.length - 1; position > 0; position--) {
+            var randomPosition = Math.floor(Math.random() * (position + 1));
+            var tile = layout[position];
+            layout[position] = layout[randomPosition];
+            layout[randomPosition] = tile;
+          }
+          return layout;
+        }
 
+        function createCard(layout, size, freeIndex, title, subtitle, freeText, cardNumber) {
+          var card = document.createElement("article");
+          card.className = "bingo-card";
+          card.setAttribute("aria-label", "Bingo card " + cardNumber);
+
+          var heading = document.createElement("header");
+          heading.className = "card-heading";
+          var titleElement = document.createElement("h1");
+          titleElement.className = "card-title";
+          titleElement.textContent = title;
+          heading.appendChild(titleElement);
+          if (subtitle) {
+            var subtitleElement = document.createElement("p");
+            subtitleElement.className = "card-subtitle";
+            subtitleElement.textContent = subtitle;
+            heading.appendChild(subtitleElement);
+          }
+
+          var grid = document.createElement("div");
+          grid.className = "card-grid";
+          grid.style.gridTemplateColumns = "repeat(" + size + ", minmax(0, 1fr))";
+          grid.style.gridTemplateRows = "repeat(" + size + ", minmax(0, 1fr))";
+          var layoutIndex = 0;
+          for (var position = 0; position < size * size; position++) {
+            var cell = document.createElement("div");
+            cell.className = "tile-cell";
+            if (position === freeIndex) {
+              cell.classList.add("free-cell");
+              cell.textContent = freeText;
+              cell.setAttribute("aria-label", freeText || "Free space");
+            } else {
+              var tile = layout[layoutIndex++];
+              if (tile) {
+                var image = document.createElement("img");
+                image.src = tile.image;
+                image.alt = tile.caption;
+                var caption = document.createElement("span");
+                caption.className = "tile-caption";
+                caption.textContent = tile.caption;
+                cell.append(image, caption);
+              } else {
+                cell.classList.add("blank-cell");
+                cell.setAttribute("aria-label", "Blank space");
+              }
+            }
+            grid.appendChild(cell);
+          }
+          card.append(heading, grid);
+          return card;
+        }
+
+        generateButton.addEventListener("click", function () {
+          var size = Number(gridSizeInput.value);
+          var useFree = freeSpaceInput.checked && size % 2 === 1;
+          var slots = size * size - (useFree ? 1 : 0);
+          var requested = Number(document.getElementById("card-count").value);
+          var title = document.getElementById("title").value.trim();
+          var subtitle = document.getElementById("subtitle").value.trim();
+          var freeText = document.getElementById("free-space-text").value.trim();
+
+          if (!Number.isInteger(requested) || requested < 1 || requested > 200) {
+            setStatus("Choose a whole number of cards from 1 to 200.", true);
+            return;
+          }
+          var availableTiles = tiles.filter(function (tile) {
+            return { ...tile, caption: tile.caption.trim() };
+          });
+
+          try {
+            applyFonts();
+            applyFontSizes();
+          } catch (error) {
+            setStatus(error.message, true);
+            return;
+          }
+
+          var capacity = layoutCapacity(availableTiles.length, slots, requested);
+          var allowDuplicates = false;
+          if (capacity < requested) {
+            allowDuplicates = window.confirm(
+              "Only " + capacity + " unique layouts are possible with these tiles and this grid. " + "Choose OK to allow duplicate layouts, or Cancel to stop and add more tile pairs.",
+            );
+            if (!allowDuplicates) {
+              setStatus("Generation canceled. Add more tile pairs or request fewer cards.", false);
+              return;
+            }
+          }
+
+          var freeIndex = useFree ? Math.floor((size * size) / 2) : -1;
+          var cards = [];
+          var usedLayouts = new Set();
+          var uniqueTarget = Math.min(requested, capacity);
+          var attempts = 0;
+          while (cards.length < uniqueTarget && attempts < uniqueTarget * 50 + 100) {
+            attempts++;
+            var layout = createLayout(availableTiles, slots);
+            var key = layout
+              .map(function (tile) {
+                return tile ? tile.id : "blank";
+              })
+              .join(",");
+            if (!usedLayouts.has(key)) {
+              usedLayouts.add(key);
+              cards.push(layout);
+            }
+          }
+          if (cards.length < uniqueTarget) {
+            setStatus("Could not create enough unique layouts. Try a smaller card count or add more tile pairs.", true);
+            return;
+          }
+          while (cards.length < requested) {
+            cards.push(createLayout(availableTiles, slots));
+          }
+
+          cardsElement.replaceChildren();
+          cards.forEach(function (layout, index) {
+            cardsElement.appendChild(createCard(layout, size, freeIndex, title, subtitle, freeText, index + 1));
+          });
+          renderDrawingPages(availableTiles);
+          generatedCards = cards.length;
+          printButton.disabled = generatedCards === 0;
+          emptyState.hidden = true;
+          document.getElementById("result-count").textContent = generatedCards + (generatedCards === 1 ? " card" : " cards");
+          var message = "Generated " + generatedCards + (generatedCards === 1 ? " card." : " cards.");
+          var blankCount = Math.max(0, slots - availableTiles.length);
+          if (blankCount) {
+            message += " " + blankCount + (blankCount === 1 ? " space is" : " spaces are") + " blank on each card.";
+          }
+          if (capacity < requested) {
+            message += " Some layouts repeat.";
+          }
+          setStatus(message, false);
+        });
+
+        printButton.addEventListener("click", function () {
+          if (generatedCards) {
+            renderDrawingPages(
+              tiles.filter(function (tile) {
+                return { ...tile, caption: tile.caption.trim() };
+              }),
+            );
+            window.print();
+          }
+        });
+
+        updateFreeSpaceAvailability();
+      })();
+    </script>
+  </body>
 </html>
