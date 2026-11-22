@@ -140,6 +140,10 @@
       margin-bottom: 0;
     }
 
+    .field[hidden] {
+      display: none;
+    }
+
     label,
     .field-label {
       font-size: 13px;
@@ -724,8 +728,8 @@
           </label>
           <span id="free-space-hint" class="hint">A free space is available on odd-sized grids.</span>
         </div>
-        <div class="field">
-          <label for="free-space-text">Free space text</label>
+        <div id="free-space-text-field" class="field">
+          <label for="free-space-text">Free Space Text</label>
           <input id="free-space-text" type="text" value="FREE SPACE" maxlength="40" />
         </div>
       </section>
@@ -822,6 +826,7 @@
       var tileList = document.getElementById("tile-list");
       var gridSizeInput = document.getElementById("grid-size");
       var freeSpaceInput = document.getElementById("free-space");
+      var freeSpaceTextField = document.getElementById("free-space-text-field");
       var generateButton = document.getElementById("generate");
       var printButton = document.getElementById("print");
       var includeDrawingPagesInput = document.getElementById("include-drawing-pages");
@@ -965,12 +970,14 @@
         if (!supported) {
           freeSpaceInput.checked = false;
         }
+        freeSpaceTextField.hidden = !freeSpaceInput.checked || freeSpaceInput.disabled;
         document.getElementById("free-space-hint").textContent = supported
-          ? 'The center square will be marked "Free Space" and will not use an image.'
+          ? ""
           : "A single center square only exists on odd-sized grids, so free space is unavailable here.";
       }
 
       gridSizeInput.addEventListener("change", updateFreeSpaceAvailability);
+      freeSpaceInput.addEventListener("change", updateFreeSpaceAvailability);
 
       function fontUrl(family) {
         var url = new URL("https://fonts.googleapis.com/css2");
