@@ -716,9 +716,24 @@
           <div class="field">
             <label class="toggle-line" for="include-drawing-pages">
               <input id="include-drawing-pages" type="checkbox" checked />
-              <span>Include tile drawing pages in preview and printout</span>
+              <span>Include calling card tile cutout pages</span>
             </label>
-            <span class="hint">Show one larger copy of each tile after the bingo cards, up to 12 per page.</span>
+            <span class="hint">Show one larger copy of each tile after the bingo cards to be cut out and used as calling cards.</span>
+          </div>
+          <div id="calling-cards-per-page-field" class="field" hidden>
+            <label for="calling-cards-per-page">Calling cards per page</label>
+            <select id="calling-cards-per-page">
+              <option value="4">4</option>
+              <option value="6">6</option>
+              <option value="8">8</option>
+              <option value="10">10</option>
+              <option value="12" selected>12</option>
+              <option value="16">16</option>
+              <option value="20">20</option>
+              <option value="24">24</option>
+              <option value="30">30</option>
+              <option value="36">36</option>
+            </select>
           </div>
           <div class="field">
             <label class="toggle-line" for="free-space">
@@ -826,6 +841,8 @@
         var generateButton = document.getElementById("generate");
         var printButton = document.getElementById("print");
         var includeDrawingPagesInput = document.getElementById("include-drawing-pages");
+        var callingCardsPerPageInput = document.getElementById("calling-cards-per-page");
+        var callingCardsPerPageField = document.getElementById("calling-cards-per-page-field");
         var status = document.getElementById("status");
         var cardsElement = document.getElementById("cards");
         var drawingPagesElement = document.getElementById("drawing-pages");
@@ -838,21 +855,45 @@
 
         function updateDrawingPagesVisibility() {
           document.body.classList.toggle("include-drawing-pages", includeDrawingPagesInput.checked && drawingPagesElement.children.length > 0);
+          callingCardsPerPageField.hidden = !includeDrawingPagesInput.checked;
+        }
+
+        function getAvailableTiles() {
+          return tiles.map(function (tile) {
+            return { ...tile, caption: tile.caption.trim() };
+          });
         }
 
         function renderDrawingPages(availableTiles) {
           drawingPagesElement.replaceChildren();
-          for (var start = 0; start < availableTiles.length; start += 12) {
+          var pageSize = Number(callingCardsPerPageInput.value);
+          var columnsByPageSize = {
+            4: 2,
+            6: 2,
+            8: 2,
+            10: 2,
+            12: 3,
+            16: 4,
+            20: 4,
+            24: 4,
+            30: 5,
+            36: 6
+          };
+          var columns = columnsByPageSize[pageSize];
+          var rows = pageSize / columns;
+          for (var start = 0; start < availableTiles.length; start += pageSize) {
             var page = document.createElement("section");
             page.className = "drawing-page";
-            page.setAttribute("aria-label", "Drawing tiles page " + (Math.floor(start / 12) + 1));
+            page.setAttribute("aria-label", "Calling cards page " + (Math.floor(start / pageSize) + 1));
 
             var heading = document.createElement("h2");
             heading.textContent = "Tiles for Drawing";
 
             var grid = document.createElement("div");
             grid.className = "drawing-grid";
-            availableTiles.slice(start, start + 12).forEach(function (tile) {
+            grid.style.gridTemplateColumns = "repeat(" + columns + ", minmax(0, 1fr))";
+            grid.style.gridTemplateRows = "repeat(" + rows + ", minmax(0, 1fr))";
+            availableTiles.slice(start, start + pageSize).forEach(function (tile) {
               var drawingTile = document.createElement("div");
               drawingTile.className = "drawing-tile";
               var image = document.createElement("img");
@@ -871,6 +912,12 @@
         }
 
         includeDrawingPagesInput.addEventListener("change", updateDrawingPagesVisibility);
+        callingCardsPerPageInput.addEventListener("change", function () {
+          if (generatedCards) {
+            renderDrawingPages(getAvailableTiles());
+          }
+        });
+        updateDrawingPagesVisibility();
 
         function fileAsDataUrl(file) {
           return new Promise(function (resolve, reject) {
@@ -1179,9 +1226,7 @@
             setStatus("Choose a whole number of cards from 1 to 200.", true);
             return;
           }
-          var availableTiles = tiles.filter(function (tile) {
-            return { ...tile, caption: tile.caption.trim() };
-          });
+          var availableTiles = getAvailableTiles();
 
           try {
             applyFonts();
@@ -1251,11 +1296,7 @@
 
         printButton.addEventListener("click", function () {
           if (generatedCards) {
-            renderDrawingPages(
-              tiles.filter(function (tile) {
-                return { ...tile, caption: tile.caption.trim() };
-              }),
-            );
+            renderDrawingPages(getAvailableTiles());
             window.print();
           }
         });
