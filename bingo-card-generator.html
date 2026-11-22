@@ -2,8 +2,8 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Bingo Card Maker</title>
   <style>
     :root {
@@ -266,7 +266,7 @@
 
     button:disabled {
       cursor: not-allowed;
-      opacity: .55;
+      opacity: 0.55;
     }
 
     .status {
@@ -402,7 +402,78 @@
       font-family: var(--free-font);
       font-size: var(--free-font-size);
       font-weight: 800;
-      letter-spacing: .08em;
+      letter-spacing: 0.08em;
+    }
+
+    .drawing-pages {
+      display: none;
+    }
+
+    body.include-drawing-pages .drawing-pages {
+      display: grid;
+      justify-items: center;
+      gap: 24px;
+    }
+
+    .drawing-page {
+      display: flex;
+      width: min(100%, 760px);
+      aspect-ratio: 8.5 / 11;
+      flex-direction: column;
+      padding: 3.2%;
+      border: 2px solid #263648;
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 5px 20px #1425371a;
+      overflow: hidden;
+    }
+
+    .drawing-page h2 {
+      flex: 0 0 auto;
+      margin: 0 0 2.2%;
+      font-family: var(--title-font);
+      font-size: clamp(18px, 2.4vw, 25px);
+      text-align: center;
+    }
+
+    .drawing-grid {
+      display: grid;
+      flex: 1 1 auto;
+      min-height: 0;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-rows: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .drawing-tile {
+      display: flex;
+      min-width: 0;
+      min-height: 0;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      border: 1px dashed #263648;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .drawing-tile img {
+      display: block;
+      width: 100%;
+      max-height: 76%;
+      flex: 1 1 auto;
+      object-fit: contain;
+    }
+
+    .drawing-caption {
+      max-width: 100%;
+      flex: 0 0 auto;
+      margin-top: 6px;
+      font-family: var(--tile-font);
+      font-size: var(--tile-font-size);
+      font-weight: 700;
+      overflow-wrap: anywhere;
     }
 
     @media (max-width: 850px) {
@@ -438,7 +509,7 @@
     @media print {
       @page {
         size: letter portrait;
-        margin: .35in;
+        margin: 0.35in;
       }
 
       html,
@@ -478,7 +549,7 @@
         height: 10.25in;
         aspect-ratio: auto;
         margin: 0;
-        padding: .15in;
+        padding: 0.15in;
         border: 2px solid #263648;
         border-radius: 0;
         box-shadow: none;
@@ -494,7 +565,7 @@
       }
 
       .card-heading {
-        padding-bottom: .12in;
+        padding-bottom: 0.12in;
       }
 
       .card-title {
@@ -518,6 +589,85 @@
       .free-cell {
         font-size: var(--free-font-size);
       }
+
+      .drawing-pages {
+        display: none;
+      }
+
+      body.include-drawing-pages .drawing-pages {
+        display: block;
+        break-before: page;
+        page-break-before: always;
+      }
+
+      .drawing-page {
+        display: flex;
+        width: 100%;
+        height: 10.25in;
+        aspect-ratio: auto;
+        flex-direction: column;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        break-after: page;
+        page-break-after: always;
+      }
+
+      .drawing-page:last-child {
+        break-after: auto;
+        page-break-after: auto;
+      }
+
+      .drawing-page h2 {
+        flex: 0 0 auto;
+        margin: 0 0 0.1in;
+        font-family: var(--title-font);
+        font-size: 16pt;
+        text-align: center;
+      }
+
+      .drawing-grid {
+        display: grid;
+        flex: 1 1 auto;
+        min-height: 0;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-rows: repeat(4, minmax(0, 1fr));
+        gap: 0.12in;
+      }
+
+      .drawing-tile {
+        display: flex;
+        min-width: 0;
+        min-height: 0;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0.12in;
+        border: 1px dashed #263648;
+        text-align: center;
+        overflow: hidden;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .drawing-tile img {
+        display: block;
+        width: 100%;
+        max-height: 76%;
+        flex: 1 1 auto;
+        object-fit: contain;
+      }
+
+      .drawing-caption {
+        max-width: 100%;
+        flex: 0 0 auto;
+        margin-top: 0.08in;
+        font-family: var(--tile-font);
+        font-size: var(--tile-font-size);
+        font-weight: 700;
+        overflow-wrap: anywhere;
+      }
     }
   </style>
 </head>
@@ -534,11 +684,11 @@
         <h2>Card details</h2>
         <div class="field">
           <label for="title">Title</label>
-          <input id="title" type="text" value="BINGO" maxlength="100">
+          <input id="title" type="text" value="BINGO" maxlength="100" />
         </div>
         <div class="field">
           <label for="subtitle">Subtitle</label>
-          <input id="subtitle" type="text" placeholder="Optional subtitle" maxlength="160">
+          <input id="subtitle" type="text" placeholder="Optional subtitle" maxlength="160" />
         </div>
         <div class="two-column">
           <div class="field">
@@ -556,77 +706,85 @@
           </div>
           <div class="field">
             <label for="card-count">Number of cards</label>
-            <input id="card-count" type="number" min="1" max="200" value="1">
+            <input id="card-count" type="number" min="1" max="200" value="1" />
             <span class="hint">Generate 1–200 cards per batch.</span>
           </div>
         </div>
         <div class="field">
+          <label class="toggle-line" for="include-drawing-pages">
+            <input id="include-drawing-pages" type="checkbox" checked />
+            <span>Include tile drawing pages in preview and printout</span>
+          </label>
+          <span class="hint">Show one larger copy of each tile after the bingo cards, up to 12 per page.</span>
+        </div>
+        <div class="field">
           <label class="toggle-line" for="free-space">
-            <input id="free-space" type="checkbox" checked>
+            <input id="free-space" type="checkbox" checked />
             <span>Include a center free space</span>
           </label>
           <span id="free-space-hint" class="hint">A free space is available on odd-sized grids.</span>
         </div>
         <div class="field">
           <label for="free-space-text">Free space text</label>
-          <input id="free-space-text" type="text" value="FREE SPACE" maxlength="40">
+          <input id="free-space-text" type="text" value="FREE SPACE" maxlength="40" />
         </div>
       </section>
 
       <section class="panel">
         <h2>Fonts</h2>
         <p class="hint">Enter a Google Fonts family name, Google Fonts stylesheet or share URL, or a direct font file
-          URL.
-          Online fonts require an internet connection.</p>
+          URL. Online fonts require an internet connection.</p>
         <div class="field font-setting">
           <div class="font-setting-control">
             <label for="title-font">Title</label>
-            <input id="title-font" type="text" value="Roboto" autocomplete="off">
+            <input id="title-font" type="text" value="Roboto" autocomplete="off" />
           </div>
           <div class="font-setting-control">
             <label for="title-font-size">Size</label>
-            <input id="title-font-size" type="number" min="8" max="48" step="any" value="24">
+            <input id="title-font-size" type="number" min="8" max="48" step="any" value="24" />
           </div>
         </div>
         <div class="field font-setting">
           <div class="font-setting-control">
             <label for="subtitle-font">Subtitle</label>
-            <input id="subtitle-font" type="text" value="Roboto" autocomplete="off">
+            <input id="subtitle-font" type="text" value="Roboto" autocomplete="off" />
           </div>
           <div class="font-setting-control">
             <label for="subtitle-font-size">Size</label>
-            <input id="subtitle-font-size" type="number" min="8" max="48" step="any" value="14">
+            <input id="subtitle-font-size" type="number" min="8" max="48" step="any" value="14" />
           </div>
         </div>
         <div class="field font-setting">
           <div class="font-setting-control">
             <label for="tile-font">Caption</label>
-            <input id="tile-font" type="text" value="Roboto" autocomplete="off">
+            <input id="tile-font" type="text" value="Roboto" autocomplete="off" />
           </div>
           <div class="font-setting-control">
             <label for="tile-font-size">Size</label>
-            <input id="tile-font-size" type="number" min="8" max="48" step="any" value="10">
+            <input id="tile-font-size" type="number" min="8" max="48" step="any" value="10" />
           </div>
         </div>
         <div class="field font-setting">
           <div class="font-setting-control">
             <label for="free-font">Free space</label>
-            <input id="free-font" type="text" value="Roboto" autocomplete="off">
+            <input id="free-font" type="text" value="Roboto" autocomplete="off" />
           </div>
           <div class="font-setting-control">
             <label for="free-font-size">Size</label>
-            <input id="free-font-size" type="number" min="8" max="48" step="any" value="14">
+            <input id="free-font-size" type="number" min="8" max="48" step="any" value="14" />
           </div>
         </div>
       </section>
 
       <section class="panel">
         <h2>Picture and caption tiles</h2>
-        <p class="hint">Captions start as the image filename; edit them below. If there are fewer captioned images
-          than grid spaces, the remaining spaces are left blank. Images stay in this browser.</p>
+        <p class="hint">
+          Captions start as the image filename; edit them below. If there are fewer captioned images than grid spaces,
+          the remaining spaces are left blank. Images stay in this browser.
+        </p>
         <label class="upload-button">
           Add image files
-          <input id="image-files" type="file" accept="image/*" multiple>
+          <input id="image-files" type="file" accept="image/*" multiple />
         </label>
         <div id="tile-list" class="tile-list"></div>
         <p id="tile-count" class="hint">No images added yet.</p>
@@ -639,7 +797,6 @@
         </div>
         <p id="status" class="status" role="status" aria-live="polite"></p>
       </section>
-
     </aside>
 
     <section class="results" aria-label="Generated bingo cards">
@@ -650,6 +807,7 @@
       <div id="empty-state" class="empty-state">Add your image and caption pairs, then select <strong>Generate
           cards</strong>.</div>
       <div id="cards"></div>
+      <div id="drawing-pages" class="drawing-pages" aria-label="Tile drawing pages"></div>
     </section>
   </main>
 
@@ -666,14 +824,52 @@
       var freeSpaceInput = document.getElementById("free-space");
       var generateButton = document.getElementById("generate");
       var printButton = document.getElementById("print");
+      var includeDrawingPagesInput = document.getElementById("include-drawing-pages");
       var status = document.getElementById("status");
       var cardsElement = document.getElementById("cards");
+      var drawingPagesElement = document.getElementById("drawing-pages");
       var emptyState = document.getElementById("empty-state");
 
       function setStatus(message, isError) {
         status.textContent = message;
         status.classList.toggle("error", Boolean(isError));
       }
+
+      function updateDrawingPagesVisibility() {
+        document.body.classList.toggle("include-drawing-pages", includeDrawingPagesInput.checked && drawingPagesElement.children.length > 0);
+      }
+
+      function renderDrawingPages(availableTiles) {
+        drawingPagesElement.replaceChildren();
+        for (var start = 0; start < availableTiles.length; start += 12) {
+          var page = document.createElement("section");
+          page.className = "drawing-page";
+          page.setAttribute("aria-label", "Drawing tiles page " + (Math.floor(start / 12) + 1));
+
+          var heading = document.createElement("h2");
+          heading.textContent = "Tiles for Drawing";
+
+          var grid = document.createElement("div");
+          grid.className = "drawing-grid";
+          availableTiles.slice(start, start + 12).forEach(function (tile) {
+            var drawingTile = document.createElement("div");
+            drawingTile.className = "drawing-tile";
+            var image = document.createElement("img");
+            image.src = tile.image;
+            image.alt = tile.caption;
+            var caption = document.createElement("span");
+            caption.className = "drawing-caption";
+            caption.textContent = tile.caption;
+            drawingTile.append(image, caption);
+            grid.appendChild(drawingTile);
+          });
+          page.append(heading, grid);
+          drawingPagesElement.appendChild(page);
+        }
+        updateDrawingPagesVisibility();
+      }
+
+      includeDrawingPagesInput.addEventListener("change", updateDrawingPagesVisibility);
 
       function fileAsDataUrl(file) {
         return new Promise(function (resolve, reject) {
@@ -717,21 +913,24 @@
           remove.textContent = "×";
           remove.setAttribute("aria-label", "Remove " + tile.fileName);
           remove.addEventListener("click", function () {
-            tiles = tiles.filter(function (candidate) { return candidate.id !== tile.id; });
+            tiles = tiles.filter(function (candidate) {
+              return candidate.id !== tile.id;
+            });
             renderTileList();
           });
 
           row.append(image, caption, remove);
           tileList.appendChild(row);
         });
-        document.getElementById("tile-count").textContent =
-          tiles.length + (tiles.length === 1 ? " image added." : " images added.");
+        document.getElementById("tile-count").textContent = tiles.length + (tiles.length === 1 ? " image added." : " images added.");
       }
 
       imageInput.addEventListener("change", async function () {
         var files = Array.prototype.slice.call(imageInput.files || []);
         imageInput.value = "";
-        var validFiles = files.filter(function (file) { return file.type.indexOf("image/") === 0; });
+        var validFiles = files.filter(function (file) {
+          return file.type.indexOf("image/") === 0;
+        });
         if (validFiles.length !== files.length) {
           setStatus("Some selected files were not images and were skipped.", true);
         } else if (files.length) {
@@ -739,14 +938,16 @@
         }
 
         try {
-          var loaded = await Promise.all(validFiles.map(async function (file) {
-            return {
-              id: nextTileId++,
-              image: await fileAsDataUrl(file),
-              fileName: file.name,
-              caption: file.name.replace(/\.[^.]+$/, "")
-            };
-          }));
+          var loaded = await Promise.all(
+            validFiles.map(async function (file) {
+              return {
+                id: nextTileId++,
+                image: await fileAsDataUrl(file),
+                fileName: file.name,
+                caption: file.name.replace(/\.[^.]+$/, ""),
+              };
+            }),
+          );
           tiles = tiles.concat(loaded);
           renderTileList();
           if (loaded.length) {
@@ -765,7 +966,7 @@
           freeSpaceInput.checked = false;
         }
         document.getElementById("free-space-hint").textContent = supported
-          ? "The center square will be marked \"Free Space\" and will not use an image."
+          ? 'The center square will be marked "Free Space" and will not use an image.'
           : "A single center square only exists on odd-sized grids, so free space is unavailable here.";
       }
 
@@ -836,9 +1037,7 @@
         } else if (fontFileUrl) {
           style = document.createElement("style");
           style.id = styleId;
-          style.textContent = "@font-face{font-family:" + familyName +
-            ";src:url(\"" + fontFileUrl.replace(/["\\]/g, "\\$&") +
-            "\");font-display:swap}";
+          style.textContent = "@font-face{font-family:" + familyName + ';src:url("' + fontFileUrl.replace(/["\\]/g, "\\$&") + '");font-display:swap}';
           document.head.appendChild(style);
         }
 
@@ -858,7 +1057,7 @@
           { id: "title-font-size", variable: "--title-font-size", label: "Title" },
           { id: "subtitle-font-size", variable: "--subtitle-font-size", label: "Subtitle" },
           { id: "tile-font-size", variable: "--tile-font-size", label: "Caption" },
-          { id: "free-font-size", variable: "--free-font-size", label: "Free space" }
+          { id: "free-font-size", variable: "--free-font-size", label: "Free space" },
         ].map(function (field) {
           var size = Number(document.getElementById(field.id).value);
           if (!Number.isFinite(size) || size < 8 || size > 48) {
@@ -979,7 +1178,9 @@
           setStatus("Choose a whole number of cards from 1 to 200.", true);
           return;
         }
-        var availableTiles = tiles.filter(function (tile) { return { ...tile, caption: tile.caption.trim() }; });
+        var availableTiles = tiles.filter(function (tile) {
+          return { ...tile, caption: tile.caption.trim() };
+        });
 
         try {
           applyFonts();
@@ -993,8 +1194,7 @@
         var allowDuplicates = false;
         if (capacity < requested) {
           allowDuplicates = window.confirm(
-            "Only " + capacity + " unique layouts are possible with these tiles and this grid. " +
-            "Choose OK to allow duplicate layouts, or Cancel to stop and add more tile pairs."
+            "Only " + capacity + " unique layouts are possible with these tiles and this grid. " + "Choose OK to allow duplicate layouts, or Cancel to stop and add more tile pairs.",
           );
           if (!allowDuplicates) {
             setStatus("Generation canceled. Add more tile pairs or request fewer cards.", false);
@@ -1002,7 +1202,7 @@
           }
         }
 
-        var freeIndex = useFree ? Math.floor(size * size / 2) : -1;
+        var freeIndex = useFree ? Math.floor((size * size) / 2) : -1;
         var cards = [];
         var usedLayouts = new Set();
         var uniqueTarget = Math.min(requested, capacity);
@@ -1010,7 +1210,11 @@
         while (cards.length < uniqueTarget && attempts < uniqueTarget * 50 + 100) {
           attempts++;
           var layout = createLayout(availableTiles, slots);
-          var key = layout.map(function (tile) { return tile ? tile.id : "blank"; }).join(",");
+          var key = layout
+            .map(function (tile) {
+              return tile ? tile.id : "blank";
+            })
+            .join(",");
           if (!usedLayouts.has(key)) {
             usedLayouts.add(key);
             cards.push(layout);
@@ -1028,11 +1232,11 @@
         cards.forEach(function (layout, index) {
           cardsElement.appendChild(createCard(layout, size, freeIndex, title, subtitle, freeText, index + 1));
         });
+        renderDrawingPages(availableTiles);
         generatedCards = cards.length;
         printButton.disabled = generatedCards === 0;
         emptyState.hidden = true;
-        document.getElementById("result-count").textContent =
-          generatedCards + (generatedCards === 1 ? " card" : " cards");
+        document.getElementById("result-count").textContent = generatedCards + (generatedCards === 1 ? " card" : " cards");
         var message = "Generated " + generatedCards + (generatedCards === 1 ? " card." : " cards.");
         var blankCount = Math.max(0, slots - availableTiles.length);
         if (blankCount) {
@@ -1045,11 +1249,18 @@
       });
 
       printButton.addEventListener("click", function () {
-        if (generatedCards) window.print();
+        if (generatedCards) {
+          renderDrawingPages(
+            tiles.filter(function (tile) {
+              return { ...tile, caption: tile.caption.trim() };
+            }),
+          );
+          window.print();
+        }
       });
 
       updateFreeSpaceAvailability();
-    }());
+    })();
   </script>
 </body>
 
